@@ -4,5 +4,5 @@
 
     <cache name="myCache"
            maxEntriesLocalHeap="10000"
-           timeToLiveSeconds="60"/>
+           timeToLiveSeconds="360"/>
 </ehcache>

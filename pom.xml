@@ -8,7 +8,7 @@
     <version>2.7.10</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
-  <groupId>com.gdn</groupId>
+  <groupId>com.gdn.developer.productivity</groupId>
   <artifactId>pullrequest-notifier</artifactId>
   <version>1.0.0-1-SNAPSHOT</version>
   <name>pullrequest-notifier</name>
@@ -43,13 +43,6 @@
       <artifactId>springfox-boot-starter</artifactId>
       <version>3.0.0</version>
     </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-xml</artifactId>
-      <version>2.10.2</version>
-    </dependency>
-
 
     <dependency>
           <groupId>org.springframework.boot</groupId>
