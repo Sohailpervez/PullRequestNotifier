@@ -13,4 +13,6 @@ public interface ErrorMessage {
     String NETWORK_UNREACHABLE = "Network is unreachable (connect failed)";
 
     String INVALID_WEBHOOK_URL = "Invalid teams webhook url";
+
+    String URI_NOT_ABSOLUTE = "URI is not absolute";
 }

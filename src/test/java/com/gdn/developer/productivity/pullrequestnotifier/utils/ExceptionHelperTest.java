@@ -29,6 +29,8 @@ class ExceptionHelperTest {
 
     private static final String UNKNOWN_ERROR = "unknown error";
 
+    private static final String URI_NOT_ABSOLUTE = "URI is not absolute";
+
     private static BusinessException businessException;
 
     @Test
@@ -71,5 +73,12 @@ class ExceptionHelperTest {
         businessException = exceptionHelper.checkBusinessException(UNKNOWN_ERROR);
         assertEquals(ErrorCode.UNKNOWN_EXCEPTION, businessException.getErrorCode());
         assertEquals(UNKNOWN_ERROR, businessException.getErrorMessage());
+    }
+
+    @Test
+    void checkBusinessException__URI_NOT_ABSOLUTE() {
+        businessException = exceptionHelper.checkBusinessException(URI_NOT_ABSOLUTE);
+        assertEquals(ErrorCode.URI_NOT_ABSOLUTE, businessException.getErrorCode());
+        assertEquals(URI_NOT_ABSOLUTE, businessException.getErrorMessage());
     }
 }
