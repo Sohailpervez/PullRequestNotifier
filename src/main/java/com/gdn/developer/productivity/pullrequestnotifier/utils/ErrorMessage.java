@@ -15,4 +15,6 @@ public interface ErrorMessage {
     String INVALID_WEBHOOK_URL = "Invalid teams webhook url";
 
     String URI_NOT_ABSOLUTE = "URI is not absolute";
+
+    String URI_NOT_PRESENT = "URI not present for given project";
 }

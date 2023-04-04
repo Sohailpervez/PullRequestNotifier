@@ -2,7 +2,6 @@ package com.gdn.developer.productivity.pullrequestnotifier.services.impl;
 
 import com.gdn.developer.productivity.pullrequestnotifier.exceptions.BusinessException;
 import com.gdn.developer.productivity.pullrequestnotifier.pojo.Account;
-import com.gdn.developer.productivity.pullrequestnotifier.pojo.MessageCard;
 import com.gdn.developer.productivity.pullrequestnotifier.pojo.PullRequest;
 import com.gdn.developer.productivity.pullrequestnotifier.pojo.Repository;
 import com.gdn.developer.productivity.pullrequestnotifier.pojo.LinkRef;
@@ -35,13 +34,13 @@ import static org.mockito.internal.verification.VerificationModeFactory.atLeastO
 class NotificationServiceImplTest {
 
     @InjectMocks
-    NotificationServiceImpl notificationService;
+    private NotificationServiceImpl notificationService;
 
     @Mock
-    BitbucketService bitbucketService;
+    private BitbucketService bitbucketService;
 
     @Mock
-    TeamsService teamsService;
+    private TeamsService teamsService;
 
     private static final String project_name = "Trial";
     private static Repository repository, repository1, emptyRepository;
@@ -53,7 +52,7 @@ class NotificationServiceImplTest {
     private static List<PullRequest> pullRequestList, pullRequestList1, emptyPullRequestList;
 
     @BeforeAll
-    public static void setup(){
+    public static void init(){
 
         html = LinkRef.builder()
                 .href("html.com")
@@ -110,12 +109,12 @@ class NotificationServiceImplTest {
         when(bitbucketService.pullRequestListByRepoName("repo 1")).thenReturn(pullRequestList1);
         when(bitbucketService.pullRequestListByRepoName("repo 2")).thenReturn(pullRequestList);
         when(bitbucketService.pullRequestListByRepoName("empty repo")).thenReturn(emptyPullRequestList);
-        when(teamsService.sendNotification(Mockito.any(MessageCard.class), Mockito.anyString()))
+        when(teamsService.sendNotifications(Mockito.any(), Mockito.anyString()))
                 .thenReturn(Boolean.TRUE);
         Boolean notificationsSent = notificationService.sendPRNotificationsByProject(project_name);
         verify(bitbucketService).repositoryListByProjectName(Mockito.anyString());
         verify(bitbucketService,times(3)).pullRequestListByRepoName(Mockito.anyString());
-        verify(teamsService,atLeastOnce()).sendNotification(Mockito.any(MessageCard.class), Mockito.anyString());
+        verify(teamsService,atLeastOnce()).sendNotifications(Mockito.any(), Mockito.anyString());
         assertTrue(notificationsSent);
     }
 
@@ -150,12 +149,12 @@ class NotificationServiceImplTest {
 
         when(bitbucketService.repositoryListByProjectName(project_name)).thenReturn(repositoryList);
         when(bitbucketService.pullRequestListByRepoName("repo 1")).thenReturn(pullRequestList);
-        when(teamsService.sendNotification(Mockito.any(MessageCard.class), Mockito.anyString()))
+        when(teamsService.sendNotifications(Mockito.any(), Mockito.anyString()))
                 .thenThrow(BusinessException.class);
         assertThrows(BusinessException.class,()-> notificationService.sendPRNotificationsByProject(project_name));
         verify(bitbucketService).repositoryListByProjectName(Mockito.anyString());
         verify(bitbucketService).pullRequestListByRepoName(Mockito.anyString());
-        verify(teamsService).sendNotification(Mockito.any(MessageCard.class), Mockito.anyString());
+        verify(teamsService).sendNotifications(Mockito.any(), Mockito.anyString());
     }
 
 }

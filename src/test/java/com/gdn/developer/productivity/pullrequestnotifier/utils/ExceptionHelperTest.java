@@ -30,7 +30,6 @@ class ExceptionHelperTest {
     private static final String UNKNOWN_ERROR = "unknown error";
 
     private static final String URI_NOT_ABSOLUTE = "URI is not absolute";
-
     private static BusinessException businessException;
 
     @Test
@@ -81,4 +80,6 @@ class ExceptionHelperTest {
         assertEquals(ErrorCode.URI_NOT_ABSOLUTE, businessException.getErrorCode());
         assertEquals(URI_NOT_ABSOLUTE, businessException.getErrorMessage());
     }
+
+
 }

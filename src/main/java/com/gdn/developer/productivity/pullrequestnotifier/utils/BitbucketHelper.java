@@ -4,6 +4,7 @@ import com.gdn.developer.productivity.pullrequestnotifier.exceptions.BusinessExc
 import com.gdn.developer.productivity.pullrequestnotifier.pojo.TokenResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,13 +24,19 @@ public class BitbucketHelper {
     @Autowired
     private ExceptionHelper exceptionHelper;
 
+    @Value("${bitbucket.client_id}")
+    private String bitbucket_client_id;
+
+    @Value("${bitbucket.secret_key}")
+    private String bitbucket_secret_key;
+
     @Cacheable(value = "myCache", key = Constants.ACCESS_TOKEN)
     public String getToken() throws BusinessException {
 
         log.info("Getting access token from bitbucket");
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(Constants.CLIENT_ID, Constants.SECRET_KEY);
+        headers.setBasicAuth(bitbucket_client_id, bitbucket_secret_key);
 
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add(Constants.GRANT_TYPE_KEY, Constants.GRANT_TYPE_VALUE);

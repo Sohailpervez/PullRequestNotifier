@@ -21,5 +21,6 @@ public class MessageCard {
     @Builder.Default
     private String summary = Constants.MESSAGECARD_SUMMARY;
     private String title;
+    private String text;
     private List<Section> sections;
 }

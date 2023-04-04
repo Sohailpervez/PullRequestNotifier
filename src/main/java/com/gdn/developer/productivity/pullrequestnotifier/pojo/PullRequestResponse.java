@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PRsResponse {
+public class PullRequestResponse {
 
     private List<PullRequest> values;
     private String next;

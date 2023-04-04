@@ -1,7 +1,7 @@
 package com.gdn.developer.productivity.pullrequestnotifier.services.impl;
 
 import com.gdn.developer.productivity.pullrequestnotifier.exceptions.BusinessException;
-import com.gdn.developer.productivity.pullrequestnotifier.pojo.PRsResponse;
+import com.gdn.developer.productivity.pullrequestnotifier.pojo.PullRequestResponse;
 import com.gdn.developer.productivity.pullrequestnotifier.pojo.PullRequest;
 import com.gdn.developer.productivity.pullrequestnotifier.pojo.ReposResponse;
 import com.gdn.developer.productivity.pullrequestnotifier.pojo.Repository;
@@ -11,6 +11,7 @@ import com.gdn.developer.productivity.pullrequestnotifier.utils.Constants;
 import com.gdn.developer.productivity.pullrequestnotifier.utils.ExceptionHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -32,16 +33,21 @@ public class BitbucketServiceImpl implements BitbucketService {
     @Autowired
     private ExceptionHelper exceptionHelper;
 
+    @Value("${repository.page.size:60}")
+    private Integer repository_page_size;
+
+    @Value("${pullrequest.page.size:30}")
+    private Integer pullrequest_page_size;
+
     @Override
     public List<Repository> repositoryListByProjectName(String project_name) throws BusinessException {
 
-        String urlBuilder = new StringBuilder(Constants.BITBUCKET_URL)
-                .append("repositories/%s?q=project.name=\"%s\"&pagelen=%s").toString();
-        String repositoryListUrl = String.format(urlBuilder, Constants.WORKSPACE_SLUG, project_name,
-                Constants.REPO_PAGE_SIZE);
+        String repositoryListUrl = String.format("%srepositories/%s?q=project.name=\"%s\"&pagelen=%s",
+                Constants.BITBUCKET_URL, Constants.WORKSPACE_SLUG, project_name, repository_page_size);
 
-            HttpEntity entity = new HttpEntity(getHeadersWithToken());
+        HttpHeaders headers = getAuthorizedHeaders();
         try {
+            HttpEntity<?> entity = new HttpEntity(headers);
             ResponseEntity<ReposResponse> response = restTemplate.exchange(repositoryListUrl, HttpMethod.GET, entity,
                     ReposResponse.class);
             ReposResponse reposResponse = response.getBody();
@@ -54,7 +60,8 @@ public class BitbucketServiceImpl implements BitbucketService {
             return repositoryList;
         }
         catch (Exception e) {
-            log.error("error occured at getToken method in Project {} - error : {}", project_name, e.getMessage(), e);
+            log.error("error occured at repositoryListByProjectName method in Project {} - error : {}", project_name,
+                    e.getMessage(), e);
             throw exceptionHelper.checkBusinessException(e.getMessage());
         }
     }
@@ -62,31 +69,29 @@ public class BitbucketServiceImpl implements BitbucketService {
     @Override
     public List<PullRequest> pullRequestListByRepoName(String repo_slug) throws BusinessException  {
 
-        String urlBuilder = new StringBuilder(Constants.BITBUCKET_URL)
-                .append("repositories/%s/%s/pullrequests?state=OPEN&pagelen=%s").toString();
-
-        String pullRequestListUrl = String.format(urlBuilder, Constants.WORKSPACE_SLUG, repo_slug,
-                Constants.PULLREQUEST_PAGE_SIZE);
-            HttpEntity entity = new HttpEntity(getHeadersWithToken());
+        String pullRequestListUrl = String.format("%srepositories/%s/%s/pullrequests?state=OPEN&pagelen=%s",
+                Constants.BITBUCKET_URL, Constants.WORKSPACE_SLUG, repo_slug, pullrequest_page_size);
+        HttpHeaders headers = getAuthorizedHeaders();
         try {
-            ResponseEntity<PRsResponse> response = restTemplate.exchange(pullRequestListUrl, HttpMethod.GET, entity,
-                    PRsResponse.class);
-            PRsResponse pRsResponse = response.getBody();
-            List<PullRequest> pullRequests = pRsResponse.getValues();
-            while (pRsResponse.getNext() != null) {
-                response = restTemplate.exchange(pRsResponse.getNext(), HttpMethod.GET, entity, PRsResponse.class);
-                pRsResponse = response.getBody();
-                pullRequests.addAll(pRsResponse.getValues());
+            HttpEntity<?> entity = new HttpEntity(headers);
+            ResponseEntity<PullRequestResponse> response = restTemplate.exchange(pullRequestListUrl, HttpMethod.GET, entity,
+                    PullRequestResponse.class);
+            PullRequestResponse pullRequestResponse = response.getBody();
+            List<PullRequest> pullRequests = pullRequestResponse.getValues();
+            while (pullRequestResponse.getNext() != null) {
+                response = restTemplate.exchange(pullRequestResponse.getNext(), HttpMethod.GET, entity, PullRequestResponse.class);
+                pullRequestResponse = response.getBody();
+                pullRequests.addAll(pullRequestResponse.getValues());
             }
             return pullRequests;
         }
         catch (Exception e){
-            log.error("error occured at getToken method - error : {}", e.getMessage(), e);
+            log.error("error occured at pullRequestListByRepoName method - error : {}", e.getMessage(), e);
             throw exceptionHelper.checkBusinessException(e.getMessage());
         }
     }
 
-    private HttpHeaders getHeadersWithToken() throws  BusinessException {
+    private HttpHeaders getAuthorizedHeaders() throws  BusinessException {
 
         HttpHeaders headers=new HttpHeaders();
         String token = bitbucketHelper.getToken();

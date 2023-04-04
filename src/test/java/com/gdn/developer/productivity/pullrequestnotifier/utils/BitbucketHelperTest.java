@@ -2,6 +2,7 @@ package com.gdn.developer.productivity.pullrequestnotifier.utils;
 
 import com.gdn.developer.productivity.pullrequestnotifier.exceptions.BusinessException;
 import com.gdn.developer.productivity.pullrequestnotifier.pojo.TokenResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,12 +29,16 @@ class BitbucketHelperTest {
     @InjectMocks
     private BitbucketHelper bitbucketHelper;
 
-    private static final String token = "abcd";
+    private static final String token = "token";
     private static TokenResponse tokenResponse = TokenResponse.builder().access_token(token).build();
     private static ResponseEntity<TokenResponse> tokenResponseEntity =
             new ResponseEntity<>(tokenResponse, HttpStatus.OK);
 
-
+    @BeforeEach
+    public void setup(){
+        ReflectionTestUtils.setField(bitbucketHelper,"bitbucket_client_id","clientId");
+        ReflectionTestUtils.setField(bitbucketHelper, "bitbucket_secret_key", "key");
+    }
     @Test
     void getToken_success() throws BusinessException {
 
